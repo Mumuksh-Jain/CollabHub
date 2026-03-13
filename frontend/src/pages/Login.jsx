@@ -27,21 +27,19 @@ export default function Login() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    setLoadingSubmit(true);
-
-    try {
-      await login(form); // Login automatically saves token + fetches user
-      navigate("/");     // Redirect to home after login
-    } catch (err) {
-      console.error(err);
-      setError(err.response?.data?.message || "Login failed");
-    } finally {
-      setLoadingSubmit(false);
-    }
-  };
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError("");
+  setLoadingSubmit(true);
+  try {
+    await login(form); // cookie handles auth
+    navigate("/");
+  } catch (err) {
+    setError(err.response?.data?.message || "Login failed");
+  } finally {
+    setLoadingSubmit(false);
+  }
+};
 
   return (
     <div className="auth-page">

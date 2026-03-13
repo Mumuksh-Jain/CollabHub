@@ -1,6 +1,5 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import { authAPI } from '../services/api';
-import API from '../services/api';
+import { createContext, useContext, useState, useEffect } from "react";
+import { authAPI, API } from "../services/api";
 
 const AuthContext = createContext(null);
 
@@ -9,9 +8,9 @@ export function AuthProvider({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Try restoring session on mount
+  // Restore session
   useEffect(() => {
-    const checkAuth = async () => {
+    const restoreSession = async () => {
       try {
         const res = await authAPI.me();
         setUser(res.data.user);
@@ -23,15 +22,15 @@ export function AuthProvider({ children }) {
         setLoading(false);
       }
     };
-    checkAuth();
+    restoreSession();
   }, []);
 
-  // Axios interceptor: if any API call returns 401, auto-logout (skip /me check)
+  // Logout on 401 from protected routes
   useEffect(() => {
     const interceptor = API.interceptors.response.use(
       (res) => res,
       (err) => {
-        const isAuthCheck = err.config?.url?.includes('/auth/me');
+        const isAuthCheck = err.config?.url?.includes("/auth/me");
         if (err.response?.status === 401 && !isAuthCheck) {
           setIsLoggedIn(false);
           setUser(null);
@@ -43,30 +42,23 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (credentials) => {
-    const res = await authAPI.login(credentials);
+    await authAPI.login(credentials); // cookie is set automatically
+    const me = await authAPI.me();
+    setUser(me.data.user);
     setIsLoggedIn(true);
-    // Fetch user data
-    try {
-      const me = await authAPI.me();
-      setUser(me.data.user);
-    } catch { setUser(null); }
-    return res.data;
   };
 
   const register = async (data) => {
-    const res = await authAPI.register(data);
+    await authAPI.register(data);
+    const me = await authAPI.me();
+    setUser(me.data.user);
     setIsLoggedIn(true);
-    try {
-      const me = await authAPI.me();
-      setUser(me.data.user);
-    } catch { setUser(null); }
-    return res.data;
   };
 
   const logout = async () => {
     await authAPI.logout();
-    setIsLoggedIn(false);
     setUser(null);
+    setIsLoggedIn(false);
   };
 
   const updateProfile = async (data) => {
@@ -84,6 +76,6 @@ export function AuthProvider({ children }) {
 
 export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
+  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
   return ctx;
 }
