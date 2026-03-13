@@ -176,9 +176,10 @@ export default function ParticleBackground() {
           height: '100%',
           objectFit: 'cover',
           transform: 'translate(-50%, -50%)',
-          opacity: 0.15, // Subtle background effect
-          filter: 'grayscale(100%) contrast(120%)', // Match brutalist aesthetic
+          opacity: 0.4, // Increased visibility
+          filter: 'contrast(110%) brightness(0.9)', // More vibrant but still subtle
         }}
+
       >
         <source src={backgroundVideo} type="video/mp4" />
       </video>
