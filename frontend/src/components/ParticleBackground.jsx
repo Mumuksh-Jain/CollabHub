@@ -4,6 +4,7 @@ import backgroundVideo from '../assets/videoplayback.mp4';
 
 export default function ParticleBackground() {
   const canvasRef = useRef(null);
+  const videoRef = useRef(null);
   const mouseRef = useRef({ x: -1000, y: -1000 });
 
   useEffect(() => {
@@ -152,6 +153,15 @@ export default function ParticleBackground() {
     };
   }, []);
 
+  // Ensure video playback
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.play().catch(err => {
+        console.warn("Video autoplay failed:", err);
+      });
+    }
+  }, []);
+
   return (
     <div style={{
       position: 'fixed',
@@ -164,6 +174,8 @@ export default function ParticleBackground() {
       background: 'var(--bg)'
     }}>
       <video
+        ref={videoRef}
+        src={backgroundVideo}
         autoPlay
         loop
         muted

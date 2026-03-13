@@ -43,7 +43,7 @@ export default function Register() {
 
   return (
     <div className="auth-page">
-      <div className="auth-card">
+      <div className="auth-card auth-card-wide-lg">
         <div className="auth-header">
           <h1>Create Account</h1>
           <p>Sign up to start collaborating on CollabHub</p>
@@ -52,75 +52,83 @@ export default function Register() {
         {error && <div className="alert alert-error">{error}</div>}
 
         <form onSubmit={handleSubmit} className="auth-form">
-          <div className="form-group">
-            <label htmlFor="name">Name</label>
-            <input
-              id="name"
-              type="text"
-              name="name"
-              placeholder="Your name"
-              value={form.name}
-              onChange={handleChange}
-              required
-            />
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="name">Name</label>
+              <input
+                id="name"
+                type="text"
+                name="name"
+                placeholder="Your name"
+                value={form.name}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="email">Email</label>
+              <input
+                id="email"
+                type="email"
+                name="email"
+                placeholder="you@example.com"
+                value={form.email}
+                onChange={handleChange}
+                required
+              />
+            </div>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              id="email"
-              type="email"
-              name="email"
-              placeholder="you@example.com"
-              value={form.email}
-              onChange={handleChange}
-              required
-            />
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="password">Password</label>
+              <input
+                id="password"
+                type="password"
+                name="password"
+                placeholder="••••••••"
+                value={form.password}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="github">GitHub Profile</label>
+              <input
+                id="github"
+                type="url"
+                name="github"
+                placeholder="https://github.com/username"
+                value={form.github}
+                onChange={handleChange}
+              />
+            </div>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              type="password"
-              name="password"
-              placeholder="••••••••"
-              value={form.password}
-              onChange={handleChange}
-              required
-            />
-          </div>
+          <div className="form-row">
+            <div className="form-group">
+              <TagSelector 
+                label="Skills"
+                placeholder="Update your skills..."
+                options={TECH_STACK_OPTIONS}
+                selectedTags={form.skills} 
+                onChange={(selected) => setForm({ ...form, skills: selected })}
+              />
+            </div>
 
-        
-           <TagSelector 
-             label="Skills"
-             placeholder="Update your skills..."
-             options={TECH_STACK_OPTIONS}
-             selectedTags={form.skills} 
-             onChange={(selected) => setForm({ ...form, skills: selected })}
-           />
-
-          <div className="form-group">
-            <label htmlFor="github">GitHub Profile</label>
-            <input
-              id="github"
-              type="url"
-              name="github"
-              placeholder="https://github.com/yourusername"
-              value={form.github}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="bio">Bio</label>
-            <textarea
-              id="bio"
-              name="bio"
-              placeholder="Tell us about yourself"
-              value={form.bio}
-              onChange={handleChange}
-            />
+            <div className="form-group">
+              <label htmlFor="bio">Bio</label>
+              <textarea
+                id="bio"
+                name="bio"
+                placeholder="Tell us about yourself"
+                value={form.bio}
+                onChange={handleChange}
+                style={{ minHeight: '120px' }}
+              />
+            </div>
           </div>
 
           <button type="submit" className="btn btn-primary btn-full" disabled={loading}>
