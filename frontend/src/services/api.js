@@ -3,7 +3,7 @@ import axios from "axios";
 
 const API = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL || "https://collabhub-backend-xros.onrender.com/api",
-  withCredentials: true, // required for cookie-based auth
+  withCredentials: true, // must be true for cookie auth
 });
 
 export const authAPI = {

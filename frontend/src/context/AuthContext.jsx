@@ -9,7 +9,7 @@ export function AuthProvider({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Restore session
+  // restore session
   useEffect(() => {
     const restoreSession = async () => {
       try {
@@ -26,7 +26,7 @@ export function AuthProvider({ children }) {
     restoreSession();
   }, []);
 
-  // Logout on 401 from protected routes
+  // logout on 401
   useEffect(() => {
     const interceptor = API.interceptors.response.use(
       (res) => res,
@@ -43,7 +43,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (credentials) => {
-    await authAPI.login(credentials); // cookie handles auth
+    await authAPI.login(credentials); // cookie is set automatically
     const me = await authAPI.me();
     setUser(me.data.user);
     setIsLoggedIn(true);

@@ -1,6 +1,6 @@
 // pages/Register.jsx
 import { useState } from "react";
-import { useNavigate, Navigate } from "react-router-dom";
+import { Link, useNavigate, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function Register() {
@@ -11,7 +11,9 @@ export default function Register() {
   const { register, isLoggedIn, loading: loadingAuth } = useAuth();
   const navigate = useNavigate();
 
+  // Wait for AuthContext to restore session
   if (loadingAuth) return <div>Loading...</div>;
+
   if (isLoggedIn) return <Navigate to="/" replace />;
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
@@ -33,16 +35,61 @@ export default function Register() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <h1>Create Account</h1>
+        <div className="auth-header">
+          <h1>Create Account</h1>
+          <p>Sign up to join CollabHub</p>
+        </div>
+
         {error && <div className="alert alert-error">{error}</div>}
-        <form onSubmit={handleSubmit}>
-          <input name="name" placeholder="Name" value={form.name} onChange={handleChange} required />
-          <input name="email" type="email" placeholder="Email" value={form.email} onChange={handleChange} required />
-          <input name="password" type="password" placeholder="Password" value={form.password} onChange={handleChange} required />
-          <button type="submit" disabled={loadingSubmit}>
-            {loadingSubmit ? "Creating..." : "Register"}
+
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div className="form-group">
+            <label htmlFor="name">Name</label>
+            <input
+              id="name"
+              type="text"
+              name="name"
+              placeholder="Your Name"
+              value={form.name}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="email">Email</label>
+            <input
+              id="email"
+              type="email"
+              name="email"
+              placeholder="you@example.com"
+              value={form.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <input
+              id="password"
+              type="password"
+              name="password"
+              placeholder="••••••••"
+              value={form.password}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <button type="submit" className="btn btn-primary btn-full" disabled={loadingSubmit}>
+            {loadingSubmit ? <span className="spinner-sm"></span> : "Register"}
           </button>
         </form>
+
+        <p className="auth-footer">
+          Already have an account? <Link to="/login">Sign In</Link>
+        </p>
       </div>
     </div>
   );
