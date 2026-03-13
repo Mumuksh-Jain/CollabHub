@@ -14,10 +14,14 @@ export default function Register() {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { register, isLoggedIn } = useAuth();
+  const { register, isLoggedIn, loading: loadingAuth } = useAuth();
   const navigate = useNavigate();
 
+  // Wait for AuthContext to restore session
+  if (loadingAuth) return <div className="loading-screen"><div className="spinner"></div></div>;
+
   if (isLoggedIn) return <Navigate to="/" replace />;
+
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
