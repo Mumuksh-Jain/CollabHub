@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-
+import TagSelector from "../components/TagSelector";
+import { TECH_STACK_OPTIONS } from '../constants/options';
 export default function Register() {
   const [form, setForm] = useState({
     name: "",
@@ -86,18 +87,14 @@ export default function Register() {
             />
           </div>
 
-          {/* Added optional fields */}
-          <div className="form-group">
-            <label htmlFor="skills">Skills</label>
-            <input
-              id="skills"
-              type="text"
-              name="skills"
-              placeholder="e.g. JavaScript, React"
-              value={form.skills}
-              onChange={handleChange}
-            />
-          </div>
+        
+           <TagSelector 
+             label="Skills"
+             placeholder="Update your skills..."
+             options={TECH_STACK_OPTIONS}
+             selectedTags={form.skills} 
+             onChange={(selected) => setForm({ ...form, skills: selected })}
+           />
 
           <div className="form-group">
             <label htmlFor="github">GitHub Profile</label>
