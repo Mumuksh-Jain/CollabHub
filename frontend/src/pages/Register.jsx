@@ -8,7 +8,7 @@ export default function Register() {
     name: "",
     email: "",
     password: "",
-    skills: "",
+    skills: [],
     github: "",
     bio: "",
   });
