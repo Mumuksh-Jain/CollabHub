@@ -6,6 +6,16 @@ The platform is built with a modern **MERN-style architecture** where the **fron
 
 ---
 
+# Screenshots
+
+### Home Page
+<div align="center">
+  <img src="frontend/src/assets/screenshots/Home.png" width="45%" />
+  <img src="frontend/src/assets/screenshots/login.png" width="45%" />
+</div>
+
+---
+
 # Features
 
 ### User Features
@@ -13,7 +23,7 @@ The platform is built with a modern **MERN-style architecture** where the **fron
 * User registration and login
 * Secure authentication using JWT
 * User profile with skills, bio, and GitHub link
-* View other developers’ profiles
+* View other developers' profiles
 
 ### Project Features
 
@@ -248,5 +258,3 @@ GET    /api/project/search
 # Author
 
 Developed as a full-stack collaboration platform project.
-
----
