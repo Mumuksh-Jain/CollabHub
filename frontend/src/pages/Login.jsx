@@ -1,14 +1,26 @@
-import { useState } from 'react';
-import { Link, useNavigate, Navigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useState, useEffect } from "react";
+import { Link, useNavigate, Navigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
-  const [form, setForm] = useState({ email: '', password: '' });
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const { login, isLoggedIn } = useAuth();
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const { login, isLoggedIn, loading: loadingAuth } = useAuth();
   const navigate = useNavigate();
 
+  // Wait for AuthContext to finish restoring session
+  if (loadingAuth) {
+    return (
+      <div className="auth-page">
+        <div className="auth-card">
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If already logged in, redirect to home
   if (isLoggedIn) return <Navigate to="/" replace />;
 
   const handleChange = (e) => {
@@ -17,15 +29,17 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
+    setError("");
+    setLoadingSubmit(true);
+
     try {
-      await login(form);
-      navigate('/');
+      await login(form); // Login automatically saves token + fetches user
+      navigate("/");     // Redirect to home after login
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
+      console.error(err);
+      setError(err.response?.data?.message || "Login failed");
     } finally {
-      setLoading(false);
+      setLoadingSubmit(false);
     }
   };
 
@@ -73,8 +87,8 @@ export default function Login() {
             />
           </div>
 
-          <button type="submit" className="btn btn-primary btn-full" disabled={loading}>
-            {loading ? <span className="spinner-sm"></span> : 'Sign In'}
+          <button type="submit" className="btn btn-primary btn-full" disabled={loadingSubmit}>
+            {loadingSubmit ? <span className="spinner-sm"></span> : "Sign In"}
           </button>
         </form>
 
