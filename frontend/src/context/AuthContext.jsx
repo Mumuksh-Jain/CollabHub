@@ -1,5 +1,6 @@
+// context/AuthContext.js
 import { createContext, useContext, useState, useEffect } from "react";
-import { authAPI, API } from "../services/api";
+import { authAPI, default as API } from "../services/api";
 
 const AuthContext = createContext(null);
 
@@ -32,8 +33,8 @@ export function AuthProvider({ children }) {
       (err) => {
         const isAuthCheck = err.config?.url?.includes("/auth/me");
         if (err.response?.status === 401 && !isAuthCheck) {
-          setIsLoggedIn(false);
           setUser(null);
+          setIsLoggedIn(false);
         }
         return Promise.reject(err);
       }
@@ -42,7 +43,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (credentials) => {
-    await authAPI.login(credentials); // cookie is set automatically
+    await authAPI.login(credentials); // cookie handles auth
     const me = await authAPI.me();
     setUser(me.data.user);
     setIsLoggedIn(true);

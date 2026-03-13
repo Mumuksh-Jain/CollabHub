@@ -1,12 +1,10 @@
+// services/api.js
 import axios from "axios";
 
 const API = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL || "https://collabhub-backend-xros.onrender.com/api",
-  withCredentials: true, // required for cookie auth
+  withCredentials: true, // required for cookie-based auth
 });
-
-// Remove JWT Authorization header interceptor — not needed
-// Remove localStorage token handling
 
 export const authAPI = {
   register: (data) => API.post("/auth/register", data),
