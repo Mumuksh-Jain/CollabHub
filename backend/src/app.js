@@ -7,7 +7,7 @@ const projectRoutes=require("../src/routes/project.routes")
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors({
-  origin: ['http://localhost:5173', "https://collab-hub1.vercel.app"],
+  origin: ['http://localhost:5173', "https://collab-hub-beige.vercel.app/"],
   credentials: true
 }))
 app.use("/api/auth",authRoutes)
