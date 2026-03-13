@@ -1,34 +1,38 @@
-// pages/Register.jsx
 import { useState } from "react";
 import { Link, useNavigate, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function Register() {
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    skills: "",
+    github: "",
+    bio: "",
+  });
   const [error, setError] = useState("");
-  const [loadingSubmit, setLoadingSubmit] = useState(false);
-
-  const { register, isLoggedIn, loading: loadingAuth } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const { register, isLoggedIn } = useAuth();
   const navigate = useNavigate();
-
-  // Wait for AuthContext to restore session
-  if (loadingAuth) return <div>Loading...</div>;
 
   if (isLoggedIn) return <Navigate to="/" replace />;
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setLoadingSubmit(true);
+    setLoading(true);
     try {
       await register(form);
       navigate("/");
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed");
     } finally {
-      setLoadingSubmit(false);
+      setLoading(false);
     }
   };
 
@@ -37,7 +41,7 @@ export default function Register() {
       <div className="auth-card">
         <div className="auth-header">
           <h1>Create Account</h1>
-          <p>Sign up to join CollabHub</p>
+          <p>Sign up to start collaborating on CollabHub</p>
         </div>
 
         {error && <div className="alert alert-error">{error}</div>}
@@ -49,7 +53,7 @@ export default function Register() {
               id="name"
               type="text"
               name="name"
-              placeholder="Your Name"
+              placeholder="Your name"
               value={form.name}
               onChange={handleChange}
               required
@@ -82,13 +86,49 @@ export default function Register() {
             />
           </div>
 
-          <button type="submit" className="btn btn-primary btn-full" disabled={loadingSubmit}>
-            {loadingSubmit ? <span className="spinner-sm"></span> : "Register"}
+          {/* Added optional fields */}
+          <div className="form-group">
+            <label htmlFor="skills">Skills</label>
+            <input
+              id="skills"
+              type="text"
+              name="skills"
+              placeholder="e.g. JavaScript, React"
+              value={form.skills}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="github">GitHub Profile</label>
+            <input
+              id="github"
+              type="url"
+              name="github"
+              placeholder="https://github.com/yourusername"
+              value={form.github}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="bio">Bio</label>
+            <textarea
+              id="bio"
+              name="bio"
+              placeholder="Tell us about yourself"
+              value={form.bio}
+              onChange={handleChange}
+            />
+          </div>
+
+          <button type="submit" className="btn btn-primary btn-full" disabled={loading}>
+            {loading ? <span className="spinner-sm"></span> : "Sign Up"}
           </button>
         </form>
 
         <p className="auth-footer">
-          Already have an account? <Link to="/login">Sign In</Link>
+          Already have an account? <Link to="/login">Sign in</Link>
         </p>
       </div>
     </div>
