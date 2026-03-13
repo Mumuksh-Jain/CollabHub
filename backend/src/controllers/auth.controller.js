@@ -25,7 +25,12 @@ async function register(req,res) {
             github
         })
         const token=jwt.sign({id:user._id},process.env.JWT_SECRET)
-        res.cookie("token",token)
+       res.cookie("token", token, {
+  httpOnly: true,
+  secure: true,
+  sameSite: "None",
+  maxAge: 7 * 24 * 60 * 60 * 1000
+})
         return res.status(201).json({message:"User registered successfully"})
     } catch (error) {
         return res.status(500).json({message:error.message})
