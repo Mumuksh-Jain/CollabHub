@@ -23,7 +23,7 @@ export default function Navbar() {
       <div className="navbar-inner">
         <Link to="/" className="navbar-brand" onClick={closeMenu}>
         <img 
-  src="/logo.png" 
+  src="/logo.jpg" 
   alt="CollabHub logo" 
   width="70" 
   height="50" 
