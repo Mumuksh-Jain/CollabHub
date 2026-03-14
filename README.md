@@ -1,4 +1,4 @@
-# CollabHub
+<h1><img src="frontend/public/logo.jpg" height="30" /> CollabHub</h1>
 
 CollabHub is a full-stack web application designed to help developers collaborate on projects. Users can create projects, request to join teams, manage members, and showcase their skills and profiles.
 
