@@ -41,7 +41,6 @@ export default function App() {
               } />
               <Route path="/faq" element={<FAQ />} />
             </Routes>
-
           </main>
           <Footer />
         </div>

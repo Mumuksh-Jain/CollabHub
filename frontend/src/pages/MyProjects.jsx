@@ -158,7 +158,7 @@ export default function MyProjects() {
                     ))}
                   </div>
                 ) : (
-                  <p style={{ fontSize: '12px', color: 'var(--text-muted)', fontStyle: 'italic', marginTop: '8px' }}>
+                  <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px' }}>
                     No members yet
                   </p>
                 )}

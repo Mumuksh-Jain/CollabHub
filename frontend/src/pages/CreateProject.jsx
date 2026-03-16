@@ -62,7 +62,7 @@ export default function CreateProject() {
 
             <div className="form-group">
               <label htmlFor="description">Description</label>
-              <textarea id="description" name="description" placeholder="What's the project about? What problem does it solve?" rows="4" value={form.description} onChange={handleChange} required />
+              <textarea id="description" name="description" placeholder="What's the project about? What problem does it solve?" rows="4" value={form.description} onChange={handleChange} required minLength={40}/>
             </div>
 
             <TagSelector 

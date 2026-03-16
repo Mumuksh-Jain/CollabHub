@@ -56,7 +56,7 @@ export default function Login() {
               id="email"
               type="email"
               name="email"
-              placeholder="you@example.com"
+              placeholder="you@gmail.com"
               value={form.email}
               onChange={handleChange}
               required

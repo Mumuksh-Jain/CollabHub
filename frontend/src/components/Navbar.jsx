@@ -1,65 +1,82 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+
 export default function Navbar() {
   const { isLoggedIn, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      setMenuOpen(false);
-      navigate('/login');
-    } catch {
-      // ignore
+  const scrollToSection = (id) => {
+    setMenuOpen(false);
+    if (location.pathname !== '/') {
+      navigate(`/#${id}`);
+      return;
+    }
+    
+    const element = document.getElementById(id);
+    if (element) {
+      const headerOffset = 90;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+      // also update hash without jump
+      window.history.pushState(null, null, `#${id}`);
     }
   };
 
-  const closeMenu = () => setMenuOpen(false);
+  const navLinks = [
+    { name: 'Home', id: 'home' },
+    { name: 'Explore', id: 'explore' },
+    { name: 'About', id: 'about' },
+    { name: 'FAQ', id: 'faq' },
+  ];
 
   return (
     <nav className="navbar">
       <div className="navbar-inner">
-        <Link to="/" className="navbar-brand" onClick={closeMenu}>
-        <img 
-  src="/logo.jpg" 
-  alt="CollabHub logo" 
-  width="70" 
-  height="50" 
-  style={{ objectFit: 'contain' }}
-/>
-          <span className="brand-text" style={{fontSize: '30px'}}>
-            {'CollabHub'}
-          </span>
+        <Link to="/" className="navbar-brand" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>
+          <img src='/logo.jpg' height='50' alt="CollabHub Logo" />
+          <span className="brand-text" style={{fontSize:'2em'}}>CollabHub</span>
         </Link>
 
-        <button
-          className="menu-toggle"
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Toggle menu"
-        >
-          <span></span>
-        </button>
-
-        <div className={`navbar-links ${menuOpen ? 'open' : ''}`}>
-          <Link to="/" className="nav-link" onClick={closeMenu}>Explore</Link>
+        {/* Desktop Links */}
+        <div className={`navbar-links ${menuOpen ? 'open' : ''}`} >
+          {navLinks.map((link) => (
+            <button 
+              key={link.id}
+              onClick={() => scrollToSection(link.id)} 
+              className="nav-link" 
+              style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'inherit' }}
+            >
+              {link.name}
+            </button>
+          ))}
+          
+          <div style={{ width: '1px', height: '20px', background: 'var(--border)', margin: '0 10px' }} className="nav-divider"></div>
+          
           {isLoggedIn ? (
             <>
-              <Link to="/create-project" className="nav-link" onClick={closeMenu}>Create</Link>
-              <Link to="/my-projects" className="nav-link" onClick={closeMenu}>My Projects</Link>
-
-
-              <Link to="/profile" className="nav-link" onClick={closeMenu}>Profile</Link>
-              <button onClick={handleLogout} className="btn btn-outline btn-sm">Logout</button>
+              <Link to="/my-projects" className="nav-link" onClick={() => setMenuOpen(false)}>My Projects</Link>
+              <Link to="/profile" className="nav-link" onClick={() => setMenuOpen(false)}>Profile</Link>
+              <button onClick={() => { logout(); setMenuOpen(false); }} className="btn btn-outline btn-sm">Logout</button>
             </>
           ) : (
             <>
-              <Link to="/login" className="btn btn-outline btn-sm" onClick={closeMenu}>Sign In</Link>
-              <Link to="/register" className="btn btn-primary btn-sm" onClick={closeMenu}>Sign Up</Link>
+              <Link to="/login" className="nav-link" onClick={() => setMenuOpen(false)}>Login</Link>
+              <Link to="/register" className="btn btn-primary btn-sm" onClick={() => setMenuOpen(false)}>Sign Up</Link>
             </>
           )}
         </div>
+
+        <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)}>
+          <span></span>
+        </button>
       </div>
     </nav>
   );

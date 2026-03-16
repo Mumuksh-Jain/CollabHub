@@ -6,6 +6,11 @@ const isProduction = process.env.NODE_ENV === "production";
 async function register(req,res) {
     try {
         const {name,email,password,skills,bio,github}=req.body
+
+        if (!email || !email.toLowerCase().endsWith("@gmail.com")) {
+            return res.status(400).json({ message: "Only Gmail addresses are allowed" });
+        }
+
         const hash=await bcrypt.hash(password,10)
         const userPresent=await userModel.findOne(
             {
