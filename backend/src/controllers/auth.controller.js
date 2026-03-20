@@ -116,4 +116,15 @@ async function getMe(req,res){
         return res.status(500).json({message:error.message})
     }
 }
-module.exports={register,login,logout,updateProfile,getMe}
+async function getAllUsers(req,res){
+    try{
+        const users = await userModel.find().select("name skills bio github")
+        return res.status(200).json({
+            message:"Users fetched successfully",
+            users:users
+        })
+    }catch(error){
+        return res.status(500).json({message:error.message})
+    }
+}
+module.exports={register,login,logout,updateProfile,getMe,getAllUsers}

@@ -13,6 +13,7 @@ export default function Home() {
   const [error, setError] = useState('');
   const { isLoggedIn } = useAuth();
   const [activeFaq, setActiveFaq] = useState(null);
+  const [visibleCount, setVisibleCount] = useState(6);
 
   const fetchProjects = async (params = {}) => {
     setLoading(true);
@@ -74,6 +75,22 @@ export default function Home() {
   const handleApplyFilter = (filters) => {
     setActiveFilters(filters);
     setShowFilter(false);
+    setVisibleCount(6); // Reset on filter
+  };
+
+  const handleLoadMore = () => {
+    setVisibleCount(prev => prev + 6);
+  };
+
+  const handleShowLess = () => {
+    setVisibleCount(6);
+    const element = document.getElementById('explore');
+    if (element) {
+      const headerOffset = 90;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+      window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+    }
   };
 
   const faqs = [
@@ -192,7 +209,7 @@ export default function Home() {
         )}
 
         <div className="projects-grid stagger-children">
-          {projects.map((project) => (
+          {projects.slice(0, visibleCount).map((project) => (
             <Link
               key={project._id}
               to={`/project/${project._id}`}
@@ -250,6 +267,29 @@ export default function Home() {
             </Link>
           ))}
         </div>
+
+        {(projects.length > visibleCount || visibleCount > 6) && (
+          <div className="fade-in" style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginTop: '60px' }}>
+            {projects.length > visibleCount && (
+              <button 
+                className="btn btn-outline" 
+                onClick={handleLoadMore}
+                style={{ padding: '14px 40px', fontSize: '1rem', fontWeight: 600, minWidth: '200px' }}
+              >
+                Load More Projects
+              </button>
+            )}
+            {visibleCount > 6 && (
+              <button 
+                className="btn btn-outline" 
+                onClick={handleShowLess}
+                style={{ padding: '14px 40px', fontSize: '1rem', fontWeight: 600, minWidth: '200px', background: 'var(--bg-warm)' }}
+              >
+                Show Less
+              </button>
+            )}
+          </div>
+        )}
       </section>
       <br/>
       {/* About Section */}
@@ -285,7 +325,7 @@ export default function Home() {
       </section>
 
       {/* FAQ Section */}
-      <section id="faq" className="section" style={{ maxWidth: '800px', margin: '0 auto', padding: '120px 20px' }}>
+      <section id="faq" className="section" style={{ maxWidth: '800px', margin: '0 auto', padding: '100px 20px' }}>
         <div className="section-header" style={{ marginBottom: '60px', justifyContent: 'center', textAlign: 'center' }}>
           <h2 style={{ fontSize: '2.5rem' }}>Frequently Asked Questions</h2>
         </div>

@@ -5,6 +5,7 @@ const userController=require("../controllers/auth.controller")
 router.post("/register",userController.register)
 router.post("/login",userController.login)
 router.get("/me",authMiddleware,userController.getMe)
+router.get("/users",authMiddleware,userController.getAllUsers)
 router.put("/update-profile",authMiddleware,userController.updateProfile)
 router.post("/logout",authMiddleware,userController.logout)
 module.exports=router

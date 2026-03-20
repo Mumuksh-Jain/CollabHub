@@ -1,16 +1,21 @@
-const express=require("express")
-const router=express.Router()
-const authMiddleware=require("../middleware/auth.middleware")
-const isOwner=require("../middleware/projectowner.middleware")
-const projectController=require("../controllers/project.controller")    
-router.post("/create",authMiddleware,projectController.createProject)
-router.get("/",projectController.getProjects)
-router.get("/search",projectController.searchProject)
-router.put("/update/:id",authMiddleware,isOwner,projectController.updateProject)
-router.delete("/delete/:id",authMiddleware,isOwner,projectController.deleteProject)
-router.post("/request",authMiddleware,projectController.requestToJoinProject)
-router.post("/:id/respond",authMiddleware,isOwner,projectController.respondJoin)
-router.get("/my-projects",authMiddleware,projectController.getMyProjects)
-router.post("/remove-member/:id", authMiddleware, isOwner, projectController.removeMember)
-router.get("/:id",projectController.getProjectById)
-module.exports=router   
+const express = require("express");
+const router = express.Router();
+const authMiddleware = require("../middleware/auth.middleware");
+const isOwner = require("../middleware/projectowner.middleware");
+const projectController = require("../controllers/project.controller");
+
+router.post("/create",              authMiddleware, projectController.createProject);
+router.get("/",                     projectController.getProjects);
+router.get("/search",               projectController.searchProject);
+router.get("/my-projects",          authMiddleware, projectController.getMyProjects);
+router.get("/my-invites",           authMiddleware, projectController.getMyInvites);        // ✅ new
+router.put("/update/:id",           authMiddleware, isOwner, projectController.updateProject);
+router.delete("/delete/:id",        authMiddleware, isOwner, projectController.deleteProject);
+router.post("/request",             authMiddleware, projectController.requestToJoinProject);
+router.post("/:id/respond",         authMiddleware, isOwner, projectController.respondJoin);
+router.post("/:id/invite/:userId",  authMiddleware, isOwner, projectController.inviteDeveloper);  // ✅ new
+router.post("/:id/invite-respond",  authMiddleware, projectController.respondToInvite);           // ✅ new
+router.post("/remove-member/:id",   authMiddleware, isOwner, projectController.removeMember);
+router.get("/:id",                  projectController.getProjectById);
+
+module.exports = router;

@@ -1,20 +1,26 @@
     const projectModel=require("../models/project.model")
     const userModel=require("../models/user.model")
-    async function createProject(req,res){
-        try {
-            const {title,description,tech_stack,roles_needed}=req.body
-            const project=await projectModel.create({
-                title,
-                description,
-                tech_stack,
-                roles_needed,
-                created_by:req.user.id
-            })
-            return res.status(201).json({message:"Project created successfully",project})
-        } catch (error) {
-            return res.status(500).json({message:error.message})
-        }
-    }    
+ async function createProject(req, res) {
+    try {
+        const { title, description, techStack, rolesNeeded } = req.body;
+
+        const project = await projectModel.create({
+            title,
+            description,
+            tech_stack: techStack,        // ✅ mapping fixed
+            roles_needed: rolesNeeded,    // ✅ mapping fixed
+            created_by: req.user.id
+        });
+
+        return res.status(201).json({
+            message: "Project created successfully",
+            project
+        });
+
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}  
     async function getProjects(req,res){
         try {   
              const projects = await projectModel.find().select("title description tech_stack roles_needed created_by members").populate("created_by","name").populate("members.user","name");
@@ -71,21 +77,32 @@
             return res.status(500).json({ message: error.message });
         }
     }   
-    async function updateProject(req,res){
-        try {
-            const allowedFields = ["title", "description", "tech_stack", "roles_needed"];
-            const updates = {};
-             allowedFields.forEach(field => {
-            if (req.body[field] !== undefined) updates[field] = req.body[field];
+   async function updateProject(req, res) {
+    try {
+        const updates = {};
+
+        if (req.body.title !== undefined) updates.title = req.body.title;
+        if (req.body.description !== undefined) updates.description = req.body.description;
+
+        // ✅ map camelCase → snake_case
+        if (req.body.techStack !== undefined) updates.tech_stack = req.body.techStack;
+        if (req.body.rolesNeeded !== undefined) updates.roles_needed = req.body.rolesNeeded;
+
+        const updatedProject = await projectModel.findByIdAndUpdate(
+            req.params.id,
+            updates,
+            { new: true }
+        );
+
+        return res.status(200).json({
+            message: "Project updated successfully",
+            updatedProject
         });
-            const updatedProject=await projectModel.findByIdAndUpdate(req.params.id,updates,{new:true})
-            return res.status(200).json({message:"Project updated successfully" ,
-                 updatedProject
-            })  
-        } catch (error) {
-            return res.status(500).json({message:error.message})
-        }
-    }   
+
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
     async function deleteProject(req,res){
         try {
             const deletedProject=await projectModel.findByIdAndDelete(req.params.id)
@@ -240,4 +257,84 @@ async function removeMember(req,res){
     return res.status(500).json({message:error.message})
   }
 }
-    module.exports={createProject,getProjects,searchProject,updateProject,deleteProject,requestToJoinProject,respondJoin,getMyProjects,getProjectById,removeMember}
+  // ─── Invite a developer ───────────────────────────────────────────────────────
+async function inviteDeveloper(req, res) {
+  try {
+    const { id, userId } = req.params;
+
+    const project = await projectModel.findById(id);
+    if (!project) return res.status(404).json({ message: "Project not found" });
+
+    // Already a member?
+    if (project.members.some(m => m.user.toString() === userId)) {
+      return res.status(400).json({ message: "User is already a member" });
+    }
+
+    // Already invited?
+    if (project.invites.some(i => i.user.toString() === userId && i.status === "pending")) {
+      return res.status(400).json({ message: "User already has a pending invite" });
+    }
+
+    project.invites.push({ user: userId });
+    await project.save();
+
+    return res.status(200).json({ message: "Invite sent successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+}
+
+// ─── Accept or decline an invite ─────────────────────────────────────────────
+async function respondToInvite(req, res) {
+  try {
+    const { id } = req.params;         // project id
+    const { action } = req.body;       // "accept" | "decline"
+    const userId = req.user.id;
+
+    const project = await projectModel.findById(id);
+    if (!project) return res.status(404).json({ message: "Project not found" });
+
+    const invite = project.invites.find(
+      i => i.user.toString() === userId && i.status === "pending"
+    );
+    if (!invite) return res.status(404).json({ message: "Invite not found" });
+
+    if (action === "accept") {
+      invite.status = "accepted";
+      project.members.push({ user: userId, role: "developer" });
+    } else if (action === "decline") {
+      invite.status = "declined";
+    } else {
+      return res.status(400).json({ message: "Invalid action" });
+    }
+
+    await project.save();
+    return res.status(200).json({ message: `Invite ${action}ed successfully` });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+}
+
+// ─── Get pending invites for logged-in user ───────────────────────────────────
+async function getMyInvites(req, res) {
+  try {
+    const userId = req.user.id;
+    const projects = await projectModel
+      .find({
+        invites: { $elemMatch: { user: userId, status: "pending" } }
+      })
+      .select("title tech_stack created_by")
+      .populate("created_by", "name");
+
+    return res.status(200).json({ invites: projects });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+}
+
+module.exports = {
+  createProject, getProjects, searchProject, updateProject,
+  deleteProject, requestToJoinProject, respondJoin,
+  getMyProjects, getProjectById, removeMember,
+  inviteDeveloper, respondToInvite, getMyInvites  // ✅ new
+};

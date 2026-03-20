@@ -6,7 +6,7 @@ import { TECH_STACK_OPTIONS, ROLE_OPTIONS } from '../constants/options';
 
 export default function CreateProject() {
   const [form, setForm] = useState({
-    title: '', description: '', tech_stack: [], roles_needed: []
+    title: '', description: '', techStack: [], rolesNeeded: []
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -24,8 +24,8 @@ export default function CreateProject() {
       const payload = {
         title: form.title,
         description: form.description,
-        tech_stack: form.tech_stack,
-        roles_needed: form.roles_needed,
+        techStack: form.techStack,
+        rolesNeeded: form.rolesNeeded,
       };
       await projectAPI.create(payload);
       navigate('/my-projects');
@@ -61,7 +61,42 @@ export default function CreateProject() {
             </div>
 
             <div className="form-group">
-              <label htmlFor="description">Description</label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <label htmlFor="description" style={{ margin: 0 }}>Description</label>
+                <button 
+                  type="button" 
+                  className="btn-ai" 
+                  onClick={async () => {
+                    if (!form.description) return;
+                    const btn = document.getElementById('ai-btn-improve');
+                    const originalText = btn.innerText;
+                    btn.disabled = true;
+                    btn.innerText = 'Improving...';
+                    try {
+                      const { aiAPI } = await import('../services/api');
+                      const res = await aiAPI.improveIdea({ idea: form.description });
+                      const { title, description, techStack, rolesNeeded } = res.data;
+                      
+                      setForm({ 
+                        ...form, 
+                        title: title || form.title, 
+                        description: description || form.description,
+                        techStack: techStack || form.techStack,
+                        rolesNeeded: rolesNeeded || form.rolesNeeded
+                      });
+                    } catch (err) {
+                      setError('AI Improvement failed');
+                    } finally {
+                      btn.disabled = false;
+                      btn.innerText = originalText;
+                    }
+                  }}
+                  id="ai-btn-improve"
+                  style={{ padding: '4px 12px', fontSize: '0.75rem' }}
+                >
+                  ✨ AI Improve Idea
+                </button>
+              </div>
               <textarea id="description" name="description" placeholder="What's the project about? What problem does it solve?" rows="4" value={form.description} onChange={handleChange} required minLength={40}/>
             </div>
 
@@ -69,8 +104,8 @@ export default function CreateProject() {
               label="Tech Stack"
               placeholder="Select technologies..."
               options={TECH_STACK_OPTIONS}
-              selectedTags={form.tech_stack} 
-              onChange={(selected) => setForm({ ...form, tech_stack: selected })}
+              selectedTags={form.techStack} 
+              onChange={(selected) => setForm({ ...form, techStack: selected })}
               required
             />
             
@@ -78,8 +113,8 @@ export default function CreateProject() {
               label="Roles Needed"
               placeholder="Select roles..."
               options={ROLE_OPTIONS}
-              selectedTags={form.roles_needed} 
-              onChange={(selected) => setForm({ ...form, roles_needed: selected })}
+              selectedTags={form.rolesNeeded} 
+              onChange={(selected) => setForm({ ...form, rolesNeeded: selected })}
               required
             />
 

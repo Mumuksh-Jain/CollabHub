@@ -160,7 +160,35 @@ export default function Profile() {
               />
 
               <div className="form-group">
-                <label htmlFor="bio">Bio</label>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <label htmlFor="bio" style={{ margin: 0 }}>Bio</label>
+                  <button 
+                    type="button" 
+                    className="btn-ai" 
+                    onClick={async () => {
+                      if (!form.bio) return;
+                      const originalBtnText = document.getElementById('ai-btn-bio').innerText;
+                      const btn = document.getElementById('ai-btn-bio');
+                      btn.disabled = true;
+                      btn.innerText = 'Enhancing...';
+                      try {
+                        const { aiAPI } = await import('../services/api');
+                        const res = await aiAPI.enhanceProfile({ bio: form.bio });
+                        setForm({ ...form, bio: res.data.result });
+                      } catch (err) {
+                        setError('AI Enhancement failed');
+                      } finally {
+                        btn.disabled = false;
+                        btn.innerText = originalBtnText;
+                      }
+                    }}
+                    id="ai-btn-bio"
+                    title="Enhance your bio with AI"
+                    style={{ padding: '4px 12px', fontSize: '0.75rem' }}
+                  >
+                    ✨ AI Enhance
+                  </button>
+                </div>
                 <textarea id="bio" name="bio" placeholder="A bit about yourself..." rows="3" value={form.bio} onChange={handleChange} />
               </div>
 
