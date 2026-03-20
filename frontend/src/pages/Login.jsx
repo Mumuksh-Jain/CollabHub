@@ -11,11 +11,10 @@ export default function Login() {
   const { login, isLoggedIn, loading: loadingAuth } = useAuth();
   const navigate = useNavigate();
 
-  // Wait for AuthContext to restore session
-  if (loadingAuth) return <div>Loading...</div>;
+  // ✅ Only redirect if we're SURE the user is logged in (auth check done)
+  if (!loadingAuth && isLoggedIn) return <Navigate to="/" replace />;
 
-  if (isLoggedIn) return <Navigate to="/" replace />;
-
+  // ✅ No more blocking — form renders immediately
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
@@ -76,7 +75,11 @@ export default function Login() {
             />
           </div>
 
-          <button type="submit" className="btn btn-primary btn-full" disabled={loadingSubmit}>
+          <button
+            type="submit"
+            className="btn btn-primary btn-full"
+            disabled={loadingSubmit}
+          >
             {loadingSubmit ? <span className="spinner-sm"></span> : 'Sign In'}
           </button>
         </form>
