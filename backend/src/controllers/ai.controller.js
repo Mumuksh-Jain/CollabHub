@@ -1,29 +1,27 @@
 const { generateAIResponse, matchTeammates } = require("../services/ai.service.js");
+const ApiResponse = require("../utils/api-response");
+const ApiError = require("../utils/api-error");
+const asyncHandler = require("../utils/async-handler");
 
 // ─── Match Teammates ────────────────────────────────────────────────────────
 // ✅ Full fixed controller function
-async function matchTeammatesController(req, res) {
+const matchTeammatesController = asyncHandler(async (req, res, next) => {
   const { project, developers } = req.body;
 
   if (!project || !developers) {
-    return res.status(400).json({ error: "Project and developers are required" });
+    throw new ApiError(400, "Project and developers are required");
   }
 
-  try {
-    const topDevelopers = await matchTeammates(project, developers);
-    res.status(200).json(topDevelopers);
-  } catch (error) {
-    console.error("Match Teammates Error:", error);
-    res.status(500).json({ error: error.message });
-  }
-}
+  const topDevelopers = await matchTeammates(project, developers);
+  res.status(200).json(new ApiResponse(200, topDevelopers));
+})
 
 // ─── Improve Project Idea ────────────────────────────────────────────────────
-async function improveIdea(req, res) {
+const improveIdea = asyncHandler(async (req, res, next) => {
   const { idea } = req.body;
 
   if (!idea) {
-    return res.status(400).json({ error: "Idea is required" });
+    throw new ApiError(400, "Idea is required");
   }
 
   const systemPrompt = `You are a senior software architect.
@@ -42,21 +40,16 @@ Return JSON with exactly this shape:
   "rolesNeeded": ["string"]
 }`;
 
-  try {
-    const raw = await generateAIResponse(userPrompt, systemPrompt);
-    res.status(200).json(JSON.parse(raw));
-  } catch (error) {
-    console.error("Improve Idea Error:", error.message);
-    res.status(500).json({ error: "Failed to improve idea", details: error.message });
-  }
-}
+  const raw = await generateAIResponse(userPrompt, systemPrompt);
+  res.status(200).json(new ApiResponse(200, JSON.parse(raw)));
+})
 
 // ─── Enhance Developer Profile ───────────────────────────────────────────────
-async function enhanceProfile(req, res) {
+const enhanceProfile = asyncHandler(async (req, res, next) => {
   const { bio } = req.body;
 
   if (!bio) {
-    return res.status(400).json({ error: "Bio is required" });
+    throw new ApiError(400, "Bio is required");
   }
 
   // ✅ FIX: Bio rewrite is plain text — don't JSON.parse it
@@ -67,13 +60,8 @@ Respond with plain text only — no JSON, no markdown, no bullet points.`;
 
 ${bio}`;
 
-  try {
-    const enhanced = await generateAIResponse(userPrompt, systemPrompt);
-    res.status(200).json({ result: enhanced.trim() });
-  } catch (error) {
-    console.error("Enhance Profile Error:", error);
-    res.status(500).json({ error: "Failed to enhance profile" });
-  }
-}
+  const enhanced = await generateAIResponse(userPrompt, systemPrompt);
+  res.status(200).json(new ApiResponse(200, { result: enhanced.trim() }));
+})
 
 module.exports = { matchTeammatesController, improveIdea, enhanceProfile };

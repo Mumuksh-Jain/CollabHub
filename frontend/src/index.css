@@ -425,11 +425,13 @@ a:hover { opacity: 0.72; }
   transition: all 0.22s ease;
   display: flex; flex-direction: column; gap: 12px;
   position: relative;
-  box-shadow: var(--shadow-sm);
+  /* subtle orange shadow on all sides */
+  box-shadow: 0 0 16px rgba(196, 92, 38, 0.12);
 }
 .project-card:hover {
   transform: translateY(-4px) rotate(0.35deg);
-  box-shadow: var(--shadow-lg);
+  /* more prominent orange shadow on hover */
+  box-shadow: 0 0 28px rgba(196, 92, 38, 0.22);
   border-color: var(--accent);
   background: #fff;
 }

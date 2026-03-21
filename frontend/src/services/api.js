@@ -40,4 +40,25 @@ export const aiAPI = {
   enhanceProfile: (data) => API.post("/ai/enhance-profile", data),
 };
 
+// Add a response interceptor to handle the standardized ApiResponse structure
+API.interceptors.response.use(
+  (response) => {
+    // If the response follows the ApiResponse structure, return the nested data
+    if (response.data && response.data.success !== undefined) {
+      // return response.data.data; 
+      // Actually, many components might expect the full response body if it contains 'message'
+      // But keeping it compatible with existing code:
+      const interceptedData = response.data.data || {};
+      if (response.data.message) {
+        interceptedData.message = response.data.message;
+      }
+      return { ...response, data: interceptedData };
+    }
+    return response;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 export default API; // ✅ this line was missing

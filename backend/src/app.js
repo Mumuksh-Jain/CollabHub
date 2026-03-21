@@ -40,19 +40,26 @@ app.use("/api/auth",    authRoutes);
 app.use("/api/project", projectRoutes);
 app.use("/api/ai",      aiRoutes);
 
+const ApiResponse = require("./utils/api-response");
+
 // ─── 404 handler ─────────────────────────────────────────────────────────────
 app.use((req, res) => {
-  res.status(404).json({ error: `Route ${req.method} ${req.path} not found` });
+  res.status(404).json(new ApiResponse(404, null, `Route ${req.method} ${req.path} not found`));
 });
 
 // ─── Global error handler ────────────────────────────────────────────────────
 app.use((err, req, res, next) => {
   console.error(`[${new Date().toISOString()}] ${err.stack}`);
-  if (err.message === "Not allowed by CORS") {
-    return res.status(403).json({ error: "CORS policy violation" });
-  }
-  res.status(err.status ?? 500).json({
-    error: err.message ?? "Internal Server Error",
+  
+  const statusCode = err.statusCode || 500;
+  const message = err.message || "Internal Server Error";
+
+  return res.status(statusCode).json({
+    success: false,
+    statusCode,
+    message,
+    errors: err.errors || [],
+    data: null
   });
 });
 
