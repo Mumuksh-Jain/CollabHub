@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { projectAPI } from '../services/api';
 
 export default function MyProjects() {
-  const [data, setData] = useState({ createdProjects: [], joinedProjects: [], pendingRequests: [], removedFromProjects: [] });
+  const [data, setData] = useState({ createdProjects: [], joinedProjects: [], pendingRequests: [], removedFromProjects: [], pendingInvitations: [] });
   const [activeTab, setActiveTab] = useState('created');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -38,6 +38,21 @@ export default function MyProjects() {
     }
   };
 
+  const handleRespondInvite = async (projectId, action) => {
+    try {
+      await projectAPI.respondInvite(projectId, action);
+      fetchMyProjects();
+      if(action === 'accept') {
+        setActiveTab('joined');
+      } else {
+        setActiveTab('invitations');
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Action failed');
+    }
+  };
+
+
   const handleDelete = async (id) => {
     if (!confirm('Are you sure you want to delete this project?')) return;
     try {
@@ -62,6 +77,7 @@ export default function MyProjects() {
     { key: 'created', label: 'Created', count: data.createdProjects?.length || 0 },
     { key: 'joined', label: 'Joined', count: data.joinedProjects?.length || 0 },
     { key: 'pending', label: 'Pending', count: data.pendingRequests?.length || 0 },
+    { key: 'invitations', label: 'Invitations', count: data.pendingInvitations?.length || 0 },
     { key: 'removed', label: 'Removed', count: data.removedFromProjects?.length || 0 },
   ];
 
@@ -258,7 +274,7 @@ export default function MyProjects() {
           {data.pendingRequests?.map(project => (
             <div key={project._id} className="project-card">
               <div className="project-card-header">
-                <Link to={`/project/${project._id}`} state={{ project }} style={{ textDecoration: 'none', color: 'inherit', opacity: 1 }}><h3 className="project-title">{project.title}</h3></Link>
+                <Link to={`/project/${project._id}`} style={{ textDecoration: 'none', color: 'inherit', opacity: 1 }}><h3 className="project-title">{project.title}</h3></Link>
                 <span className="project-author">by {project.created_by?.name || 'Unknown'}</span>
               </div>
               <div className="project-tags">
@@ -266,7 +282,46 @@ export default function MyProjects() {
                   <span key={i} className="tag tag-tech">{t}</span>
                 ))}
               </div>
-              <span className="status-badge status-pending">Pending</span>
+              <span className="status-badge status-pending">Pending Request sent</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Invitations Tab */}
+      {!loading && activeTab === 'invitations' && (
+        <div className="projects-list">
+          {data.pendingInvitations?.length === 0 && (
+            <div className="empty-state">
+              <h3>No invitations</h3>
+              <p>You have no project invitations.</p>
+            </div>
+          )}
+          {data.pendingInvitations?.map(project => (
+            <div key={project._id} className="project-card" style={{ border: '1px solid var(--accent)' }}>
+              <div className="project-card-header">
+                <Link to={`/project/${project._id}`} style={{ textDecoration: 'none', color: 'inherit', opacity: 1 }}><h3 className="project-title">{project.title}</h3></Link>
+                <span className="project-author">Invited by {project.created_by?.name || 'Unknown'}</span>
+              </div>
+              <div className="project-tags">
+                {project.tech_stack?.map((t, i) => (
+                  <span key={i} className="tag tag-tech">{t}</span>
+                ))}
+              </div>
+              <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                <button
+                  className="btn btn-primary btn-sm"
+                  onClick={() => handleRespondInvite(project._id, 'accept')}
+                >
+                  ✓ Accept Invite
+                </button>
+                <button
+                  className="btn btn-outline btn-sm"
+                  onClick={() => handleRespondInvite(project._id, 'reject')}
+                >
+                  ✕ Decline
+                </button>
+              </div>
             </div>
           ))}
         </div>

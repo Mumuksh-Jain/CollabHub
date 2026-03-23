@@ -87,6 +87,8 @@ Routes act like a map directory, pointing specific URLs to the code that handles
     *   `PUT /update/:id` & `DELETE /delete/:id`: (Guarded by Owner) Modifies or removes projects.
     *   `POST /request`: (Guarded) A user clicks "Join" on the frontend; this route adds them to the project's pending `join_requests` list.
     *   `POST /:id/respond`: (Guarded by Owner) The owner approves/denies a pending user.
+    *   `POST /invite/:id`: (Guarded by Owner) The project owner directly sends an invitation to a recommended user.
+    *   `POST /respond-invite/:id`: (Guarded) The invited user accepts or declines the invitation.
     *   `POST /remove-member/:projectId`: (Guarded by Owner) The owner can remove an existing member from the project.
     *   `GET /search`: Searches for projects by title, tech stack (array), or roles (array). Supports both standard queries and robust array-based filtering.
 

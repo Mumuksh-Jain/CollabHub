@@ -182,11 +182,24 @@
         .select("title tech_stack roles_needed created_by")
         .populate("created_by","name")
 
+        const pendingInvitations = await projectModel
+        .find({
+            invitations:{
+                $elemMatch:{
+                    user:userId,
+                    status:"pending"
+                }
+            }
+        })
+        .select("title tech_stack roles_needed created_by")
+        .populate("created_by","name")
+
         return res.status(200).json({
             createdProjects,
             joinedProjects,
             pendingRequests,
-            removedFromProjects
+            removedFromProjects,
+            pendingInvitations
         })
 
     } catch (error) {
@@ -240,4 +253,58 @@ async function removeMember(req,res){
     return res.status(500).json({message:error.message})
   }
 }
-    module.exports={createProject,getProjects,searchProject,updateProject,deleteProject,requestToJoinProject,respondJoin,getMyProjects,getProjectById,removeMember}
+
+async function inviteMember(req, res) {
+    try {
+        const { id } = req.params; // project id
+        const { userId } = req.body;
+        
+        const project = await projectModel.findById(id);
+        if (!project) return res.status(404).json({ message: "Project not found" });
+        
+        // Ensure user is not already member
+        const isMember = project.members.some(m => m.user.toString() === userId);
+        if (isMember) return res.status(400).json({ message: "User is already a member" });
+        
+        // Ensure not already invited
+        const alreadyInvited = project.invitations.some(i => i.user.toString() === userId && i.status === "pending");
+        if (alreadyInvited) return res.status(400).json({ message: "User is already invited" });
+        
+        project.invitations.push({ user: userId });
+        await project.save();
+        
+        return res.status(200).json({ message: "Invitation sent successfully" });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+async function respondToInvitation(req, res) {
+    try {
+        const { id } = req.params; // project id
+        const { action } = req.body; // accept or reject
+        const userId = req.user.id;
+        
+        const project = await projectModel.findById(id);
+        if (!project) return res.status(404).json({ message: "Project not found" });
+        
+        const invitation = project.invitations.find(i => i.user.toString() === userId && i.status === "pending");
+        if (!invitation) return res.status(404).json({ message: "Pending invitation not found" });
+        
+        if (action === "accept") {
+            invitation.status = "accepted";
+            project.members.push({ user: userId, role: "developer" });
+        } else if (action === "reject") {
+            invitation.status = "rejected";
+        } else {
+            return res.status(400).json({ message: "Invalid action" });
+        }
+        
+        await project.save();
+        return res.status(200).json({ message: `Invitation ${action}ed successfully` });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+module.exports={createProject,getProjects,searchProject,updateProject,deleteProject,requestToJoinProject,respondJoin,getMyProjects,getProjectById,removeMember,inviteMember,respondToInvitation}

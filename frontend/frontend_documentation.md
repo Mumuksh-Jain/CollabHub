@@ -62,7 +62,15 @@ The frontend cleanly integrates with our Groq-powered backend AI services:
 1. **AI Bio Enhancer**: On `Profile.jsx`, users click a button that uses `aiAPI.enhanceProfile` to automatically rewrite their bio to sound more professional.
 2. **AI Idea Improver**: On `CreateProject.jsx`, users can click an AI button to format their raw project idea into a well-structured title, description, and tags using `aiAPI.improveIdea`.
 3. **AI Teammate Matcher**: On `ProjectDetail.jsx`, the project owner can click a button to scan all developers. The frontend uses `aiAPI.match` to display recommendations complete with matching percentages and a visual progress bar. Clicking on an AI recommendation navigates to the detailed `UserProfile.jsx` using the `getUserById` API endpoint.
+4. **AI Match Invitations**: Project owners can seamlessly send project join invitations directly to the AI-recommended users with the click of a button.
 
+---
+
+## Interactive Dashboards
+*   **My Projects Dashboard (`MyProjects.jsx`)**: Acts as the central hub for users to track projects they created, projects they joined, and pending join requests. 
+*   **Invitations Tab**: When a project owner invites a user (e.g., from the AI Matcher), the invited user can view these pending invites under the "Invitations" tab and seamlessly click to accept or decline, triggering `projectAPI.respondInvite`.
+
+---
 ---
 
 ## How It All Connects (The User Journey)

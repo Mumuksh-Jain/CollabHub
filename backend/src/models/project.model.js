@@ -40,6 +40,13 @@ const projectSchema=new mongoose.Schema({
             user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
             removed_at: { type: Date, default: Date.now }
         }
+    ],
+    invitations: [
+        {
+            user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+            status: { type: String, enum: ["pending", "accepted", "rejected"], default: "pending" },
+            invited_at: { type: Date, default: Date.now }
+        }
     ]
      
 })

@@ -72,6 +72,15 @@ export default function ProjectDetail() {
     }
   };
 
+  const handleInvite = async (userId) => {
+    try {
+      const res = await projectAPI.inviteMember(project._id, userId);
+      setMessage(res.data.message);
+    } catch (err) {
+       setMessage(err.response?.data?.message || 'Invite failed');
+    }
+  };
+
   return (
     <div className="page">
       <div className="detail-page">
@@ -208,6 +217,13 @@ export default function ProjectDetail() {
                         ></div>
                       </div>
                     )}
+                    <button 
+                      className="btn btn-primary btn-sm" 
+                      style={{ marginTop: '16px', display: 'block', width: '100%' }}
+                      onClick={() => handleInvite(rec.id)}
+                    >
+                      ✉️ Send Invite
+                    </button>
                   </div>
                 ))}
               </div>

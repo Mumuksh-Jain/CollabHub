@@ -62,6 +62,10 @@ export const projectAPI = {
   getMyProjects: () => API.get("/project/my-projects"),
   removeMember: (projectId, userId) =>
     API.post(`/project/remove-member/${projectId}`, { userId }),
+  inviteMember: (projectId, userId) =>
+    API.post(`/project/invite/${projectId}`, { userId }),
+  respondInvite: (projectId, action) =>
+    API.post(`/project/respond-invite/${projectId}`, { action }),
 };
 
 export default API;
