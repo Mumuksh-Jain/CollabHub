@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL || "https://collabhub-backend-xros.onrender.com/api",
+  baseURL: "http://localhost:8000/api",
   withCredentials: true, // must be true for cookie auth
 });
 

@@ -1,7 +1,7 @@
 const userModel=require("../models/user.model")
 const jwt=require("jsonwebtoken")
 const bcrypt=require("bcrypt")
-const isProduction = process.env.NODE_ENV === "production";
+
 
 async function register(req,res) {
     try {
@@ -33,8 +33,8 @@ async function register(req,res) {
         const token=jwt.sign({id:user._id},process.env.JWT_SECRET)
     res.cookie("token", token, {
   httpOnly: true,
-  secure: isProduction,           // only secure in production
-  sameSite: isProduction ? "None" : "Lax", // cross-site in prod, Lax in dev
+  secure:true,           // only secure in production
+  sameSite: "None", // cross-site in prod, Lax in dev
   maxAge: 7 * 24 * 60 * 60 * 1000
 });
         return res.status(201).json({message:"User registered successfully"})

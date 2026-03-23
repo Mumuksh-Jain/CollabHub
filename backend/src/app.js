@@ -9,7 +9,6 @@ app.use(cookieParser())
 app.use(
   cors({
     origin: function (origin, callback) {
-
       const allowedOrigins = [
         "http://localhost:5173",
         "https://collab-hub1.vercel.app"
