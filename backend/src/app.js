@@ -4,6 +4,9 @@ const cookieParser=require("cookie-parser")
 const cors=require("cors")
 const authRoutes=require("../src/routes/auth.route")
 const projectRoutes=require("../src/routes/project.routes")
+app.get("/api/health", (req, res) => {
+  res.status(200).send("OK");
+});
 app.use(express.json())
 app.use(cookieParser())
 app.use(
