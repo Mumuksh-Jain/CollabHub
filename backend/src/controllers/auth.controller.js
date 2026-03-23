@@ -65,8 +65,8 @@ async function login(req,res)
         const token=jwt.sign({id:user._id},process.env.JWT_SECRET)
         res.cookie("token", token, {
   httpOnly: true,
-  secure: isProduction,           // only secure in production
-  sameSite: isProduction ? "None" : "Lax", // cross-site in prod, Lax in dev
+  secure: true,           // only secure in production
+  sameSite: "None", // cross-site in prod, Lax in dev
   maxAge: 7 * 24 * 60 * 60 * 1000
 });
         return res.status(200).json({message:"User logged in successfully"})
