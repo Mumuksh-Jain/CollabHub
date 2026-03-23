@@ -4,6 +4,7 @@ const cookieParser=require("cookie-parser")
 const cors=require("cors")
 const authRoutes=require("../src/routes/auth.route")
 const projectRoutes=require("../src/routes/project.routes")
+const aiRoutes=require("../src/routes/ai.route")
 app.get("/api/health", (req, res) => {
   res.status(200).send("OK");
 });
@@ -30,9 +31,11 @@ app.use(
     credentials: true
   })
 );
+
+
 app.use("/api/auth",authRoutes)
 app.use("/api/project",projectRoutes)
+app.use("/api/ai", aiRoutes)
 
-    
 module.exports=app
 

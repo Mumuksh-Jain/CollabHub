@@ -46,7 +46,7 @@ frontend/
 │   │   └── ProtectedRoute.jsx       # The "Security Guard" component. Kicks you out if you try to view a private page while logged out.
 │   └── pages/
 │       ├── Home.jsx                 # The landing page showing all public projects.
-│       ├── Login.jsx                # The page where you type your email and password.
+        ├── Login.jsx                # The page where you type your email and password.
 │       ├── Register.jsx             # The page to sign up for a new account.
 │       ├── CreateProject.jsx        # The form to post a new project idea.
 │       ├── MyProjects.jsx           # Your personal dashboard (shows projects you joined/own).
@@ -54,6 +54,14 @@ frontend/
 │       ├── UserProfile.jsx          # The public view of *someone else's* profile.
 │       └── ProjectDetail.jsx        # The page showing extra details about a specific project.
 ```
+
+---
+
+## AI Features & Integration
+The frontend cleanly integrates with our Groq-powered backend AI services:
+1. **AI Bio Enhancer**: On `Profile.jsx`, users click a button that uses `aiAPI.enhanceProfile` to automatically rewrite their bio to sound more professional.
+2. **AI Idea Improver**: On `CreateProject.jsx`, users can click an AI button to format their raw project idea into a well-structured title, description, and tags using `aiAPI.improveIdea`.
+3. **AI Teammate Matcher**: On `ProjectDetail.jsx`, the project owner can click a button to scan all developers. The frontend uses `aiAPI.match` to display recommendations complete with matching percentages and a visual progress bar. Clicking on an AI recommendation navigates to the detailed `UserProfile.jsx` using the `getUserById` API endpoint.
 
 ---
 
@@ -101,5 +109,10 @@ Here is a step-by-step example of what happens on the frontend when a user visit
 *   The component checks the `AuthContext` backpack to see if the user is logged in.
 *   If the user is not logged in, the component redirects them to the `/login` page.
 *   If the user is logged in, the component allows the user to access the private page.
+
+### 7. User Profiles and Sharing (`UserProfile.jsx`)
+*   To allow seamless viewing of team members and AI recommendations, we implemented `authAPI.getUserById()`.
+*   When a user clicks a team member's name (in a badge or an AI recommendation card), the frontend navigates to `/user/:id`. 
+*   If the user data isn't already loaded in frontend memory, it gracefully fetches the latest data directly from the server using the ID.
 
 

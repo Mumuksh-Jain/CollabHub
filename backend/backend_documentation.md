@@ -32,11 +32,15 @@ backend/
 │   │   ├── auth.middleware.js       # The security guard: checks if a user is logged in before letting them do something.
 │   │   └── projectowner.middleware.js # The bouncer: checks if a user is the actual OWNER of a project.
 │   ├── controllers/
-│   │   ├── auth.controller.js       # The actual logic (the "how") for registering, logging in, etc.
-│   │   └── project.controller.js    # The actual logic for creating, finding, or modifying projects.
+│   │   ├── auth.controller.js       # The actual logic (the "how") for registering, logging in, fetching users, etc.
+│   │   ├── project.controller.js    # The actual logic for creating, finding, or modifying projects.
+│   │   └── ai.controller.js         # The logic defining interactions with our external LLM for idea formatting, etc.
+│   ├── services/
+│   │   └── ai.service.js            # Talks directly to the Groq API (Llama3) securely using our backend secret key.
 │   └── routes/
 │       ├── auth.route.js            # Defines the URLs (like /login) that trigger the Auth Controller.
-│       └── project.routes.js        # Defines the URLs (like /create) that trigger the Project Controller.
+│       ├── project.routes.js        # Defines the URLs (like /create) that trigger the Project Controller.
+│       └── ai.route.js              # Defines URLs (like /match) that trigger the AI controller.
 ```
 
 ---
@@ -75,7 +79,8 @@ Routes act like a map directory, pointing specific URLs to the code that handles
     *   `POST /register`: Points to the new user creation logic.
     *   `POST /login`: Points to the login verify logic.
     *   `POST /logout`: Clears the user's secure cookie.
-    *   `PUT /profile`: Updates user info.
+    *   `PUT /update-profile`: Updates user info.
+    *   `GET /user/:id`: Fetches public profile details of any specific user.
 *   **`project.routes.js`**:
     *   `GET /`: Fetches a list of all projects to show on the homepage.
     *   `POST /create`: (Guarded) Points to logic to make a new project.
@@ -87,6 +92,7 @@ Routes act like a map directory, pointing specific URLs to the code that handles
 
 ### 5. Controllers (The Brains)
 The controllers contain the actual JavaScript logic to make the database do what the Routes asked for.
-*   **`auth.controller.js`**: For registration, it uses the `bcrypt` library to encrypt the user's password before calling the `userModel` to save them. For logging in, it compares passwords, and if correct, generates a JWT token and assigns it to a strict `httpOnly` cookie (which prevents frontend JavaScript hackers from stealing it).
+*   **`auth.controller.js`**: For registration, it uses the `bcrypt` library to encrypt the user's password before calling the `userModel` to save them. For logging in, it compares passwords, and if correct, generates a JWT token and assigns it to a strict `httpOnly` cookie (which prevents frontend JavaScript hackers from stealing it). It also handles returning complete public profile data via `getUserById`.
 *   **`project.controller.js`**: Contains massive logical functions. For example, when fetching `getProjects`, it doesn't just return raw data; it uses Mongoose's `.populate()` feature. This tells the database: *"Instead of sending back the confusing ID string for `created_by`, go fetch that user's actual profile name and send that instead!"* 
     *   **Advanced Search Logic**: The `searchProject` controller is highly robust. It handles text searches (`q`) and filtered searches for multiple `tech_stack` and `roles_needed` items simultaneously. It uses the MongoDB `$in` operator to match any selected tags, ensuring flexible and powerful project discovery. It also handles both standard Axios array formats (`tech_stack[]`) and cleaner formats (`tech_stack`).
+*   **`ai.controller.js` & `ai.service.js`**: These files control our AI integrations that power Bio Enhancements, Project Idea Generation, and Project Teammate Matching. The service strictly requires responses in `JSON` format so our frontend can reliably display dynamic match percentages, badges, and progress bars without crashing.

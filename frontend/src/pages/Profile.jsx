@@ -5,7 +5,7 @@ import TagSelector from '../components/TagSelector';
 import { TECH_STACK_OPTIONS } from '../constants/options';
 
 export default function Profile() {
-  const { updateProfile } = useAuth();
+  const { updateProfile, enhanceBio } = useAuth();
   const [user, setUser] = useState(null);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({ name: '', skills: [], bio: '', github: '' });
@@ -160,7 +160,33 @@ export default function Profile() {
               />
 
               <div className="form-group">
-                <label htmlFor="bio">Bio</label>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <label htmlFor="bio" style={{ margin: 0 }}>Bio</label>
+                  <button 
+                    type="button" 
+                    className="btn-ai"
+                    onClick={async () => {
+                      if (!form.bio) return;
+                      const btn = document.getElementById('ai-btn-enhance');
+                      const originalText = btn.innerText;
+                      btn.disabled = true;
+                      btn.innerText = 'Enhancing...';
+                      try {
+                        const result = await enhanceBio(form.bio);
+                        setForm({ ...form, bio: result });
+                      } catch (err) {
+                        setError('AI Enhancement failed');
+                      } finally {
+                        btn.disabled = false;
+                        btn.innerText = originalText;
+                      }
+                    }}
+                    id="ai-btn-enhance"
+                    style={{ padding: '4px 12px', fontSize: '0.75rem' }}
+                  >
+                    ✨ AI Enhance
+                  </button>
+                </div>
                 <textarea id="bio" name="bio" placeholder="A bit about yourself..." rows="3" value={form.bio} onChange={handleChange} />
               </div>
 

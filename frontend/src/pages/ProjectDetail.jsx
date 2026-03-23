@@ -5,12 +5,15 @@ import { useState, useEffect } from 'react';
 
 export default function ProjectDetail() {
   const { id } = useParams();
-  const { isLoggedIn, user } = useAuth();
+  const { isLoggedIn, user, getUsers } = useAuth();
   const navigate = useNavigate();
   const [project, setProject] = useState(null);
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
+  const [recommendations, setRecommendations] = useState([]);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [allUsers, setAllUsers] = useState([]); // Store all users for AI matching
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -116,9 +119,14 @@ export default function ProjectDetail() {
               <h4>Team Members</h4>
               <div className="members-list">
                 {project.members.map((m, i) => (
-                  <span key={i} className="member-chip">
+                  <button 
+                    key={i} 
+                    className="member-chip member-chip-btn"
+                    onClick={() => navigate(`/user/${m.user?._id || m.user}`, { state: { user: m.user } })}
+                    title="View Profile"
+                  >
                     {m.user?.name || 'Unknown'} — {m.role}
-                  </span>
+                  </button>
                 ))}
               </div>
             </div>
@@ -127,6 +135,82 @@ export default function ProjectDetail() {
           {message && (
             <div className={`alert ${message.includes('lacking') || message.includes('already') || message.includes('failed') ? 'alert-error' : 'alert-success'}`}>
               {message}
+            </div>
+          )}
+
+          {isLoggedIn && isCreator && (
+            <div className="detail-section" style={{ borderTop: '1px solid var(--border)', paddingTop: '24px', marginTop: '24px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <h4 style={{ margin: 0 }}>✨ AI Recommended Teammates</h4>
+                <button 
+                  className="btn-ai" 
+                  style={{ padding: '6px 14px', fontSize: '0.8rem' }}
+                  id="ai-btn-match"
+                  onClick={async () => {
+                    const btn = document.getElementById('ai-btn-match');
+                    btn.disabled = true;
+                    btn.innerText = 'Analyzing...';
+                    setAiLoading(true);
+                    setRecommendations([]);
+                    try {
+                      const { aiAPI } = await import('../services/api');
+                      const usersRes = await getUsers();
+                      setAllUsers(usersRes.users);
+                      const matchRes = await aiAPI.match({ project, users: usersRes.users });
+                      setRecommendations(matchRes.result);
+                    } catch (err) {
+                      setMessage('Failed to get recommendations');
+                    } finally {
+                      btn.disabled = false;
+                      btn.innerText = '✨ Refresh Recommendations';
+                      setAiLoading(false);
+                    }
+                  }}
+                >
+                  Get AI Recommendations
+                </button>
+              </div>
+
+              {aiLoading && (
+                <div className="ai-loading">
+                  <div className="spinner-sm"></div>
+                  <p style={{ fontSize: '0.9rem' }}>Searching for the best matches...</p>
+                </div>
+              )}
+
+              <div className="stagger-children">
+                {recommendations.map((rec, i) => (
+                  <div key={i} className="ai-recommendation-card fade-in" style={{ animationDelay: `${i * 0.1}s` }}>
+                    <div className="ai-match-header">
+                      <div className="ai-match-info">
+                        <strong 
+                          className="clickable-name"
+                          onClick={() => {
+                            const fullUser = allUsers.find(u => u._id === rec.id || u.id === rec.id);
+                            navigate(`/user/${rec.id}`, { state: { user: fullUser || rec } });
+                          }}
+                          title="View Profile"
+                        >
+                          {rec.name}
+                        </strong>
+                        {rec.percentage > 0 && (
+                          <span className="ai-percentage">{rec.percentage}% Match</span>
+                        )}
+                      </div>
+                      <span className="ai-badge">Match</span>
+                    </div>
+                    <p className="ai-reason">{rec.reason}</p>
+                    {rec.percentage > 0 && (
+                      <div className="ai-progress-container">
+                        <div 
+                          className="ai-progress-bar" 
+                          style={{ width: `${rec.percentage}%` }}
+                        ></div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 

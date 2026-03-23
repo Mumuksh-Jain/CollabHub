@@ -68,8 +68,25 @@ export function AuthProvider({ children }) {
     return res.data;
   };
 
+  const getUsers = async () => {
+    const res = await authAPI.getUsers();
+    return res.data;
+  };
+
+  const enhanceBio = async (bio) => {
+    const { aiAPI } = await import("../services/api");
+    const res = await aiAPI.enhanceProfile({ bio });
+    return res.result;
+  };
+
+  const improveIdea = async (idea) => {
+    const { aiAPI } = await import("../services/api");
+    const res = await aiAPI.improveIdea({ idea });
+    return res;
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isLoggedIn, loading, login, register, logout, updateProfile }}>
+    <AuthContext.Provider value={{ user, isLoggedIn, loading, login, register, logout, updateProfile, getUsers, enhanceBio, improveIdea }}>
       {children}
     </AuthContext.Provider>
   );

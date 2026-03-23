@@ -13,6 +13,7 @@ export default function Home() {
   const [error, setError] = useState('');
   const { isLoggedIn } = useAuth();
   const [activeFaq, setActiveFaq] = useState(null);
+  const [visibleCount, setVisibleCount] = useState(6);
 
   const fetchProjects = async (params = {}) => {
     setLoading(true);
@@ -192,12 +193,12 @@ export default function Home() {
         )}
 
         <div className="projects-grid stagger-children">
-          {projects.map((project) => (
+          {projects.slice(0, visibleCount).map((project) => (
             <Link
               key={project._id}
               to={`/project/${project._id}`}
               state={{ project }}
-              className="project-card"
+              className="project-card fade-in"
               style={{ textDecoration: 'none', color: 'inherit' }}
             >
               <div className="project-card-header">
@@ -250,6 +251,28 @@ export default function Home() {
             </Link>
           ))}
         </div>
+
+        {projects.length > 6 && (
+          <div style={{ marginTop: '48px', display: 'flex', justifyContent: 'center', gap: '16px' }}>
+            {visibleCount < projects.length ? (
+              <button 
+                className="btn btn-primary" 
+                onClick={() => setVisibleCount(prev => prev + 6)}
+                style={{ padding: '12px 32px' }}
+              >
+                Load More Projects
+              </button>
+            ) : (
+              <button 
+                className="btn btn-outline" 
+                onClick={() => setVisibleCount(6)}
+                style={{ padding: '12px 32px' }}
+              >
+                Show Less
+              </button>
+            )}
+          </div>
+        )}
       </section>
       <br/>
       {/* About Section */}

@@ -34,6 +34,11 @@ The platform is built with a modern **MERN-style architecture** where the **fron
 * Remove project members
 * Dashboard showing your owned or joined projects
 
+### AI Integrations
+* **Match Teammates**: Automatically analyze a project's needs and current user skills, matching the best candidates to the project with match percentages and visual progress bars.
+* **Enhance Profile**: Instantly generate a clean, professional biography using LLM integration on the profile edit page.
+* **Improve Idea**: Automatically format raw user input into a highly structured title, description, and list of required skills/roles for new projects.
+
 ### Security Features
 
 * JWT authentication
@@ -227,7 +232,8 @@ http://localhost:3000
 POST /api/auth/register
 POST /api/auth/login
 POST /api/auth/logout
-PUT  /api/auth/profile
+PUT  /api/auth/update-profile
+GET  /api/auth/user/:id
 ```
 
 ## Projects
@@ -241,6 +247,14 @@ POST   /api/project/request
 POST   /api/project/:id/respond
 POST   /api/project/remove-member/:projectId
 GET    /api/project/search
+```
+
+## AI Tools
+
+```
+POST   /api/ai/match
+POST   /api/ai/improve-idea
+POST   /api/ai/enhance-profile
 ```
 
 ---

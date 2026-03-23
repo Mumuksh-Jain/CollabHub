@@ -1,9 +1,38 @@
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { authAPI } from '../services/api';
 
 export default function UserProfile() {
+  const { id } = useParams();
   const { state } = useLocation();
   const navigate = useNavigate();
-  const user = state?.user;
+  const [user, setUser] = useState(state?.user || null);
+  const [loading, setLoading] = useState(!state?.user);
+
+  useEffect(() => {
+    if (!user && id) {
+      const fetchUser = async () => {
+        try {
+          const res = await authAPI.getUserById(id);
+          setUser(res.data.user);
+        } catch (err) {
+          console.error("Fetch user error:", err);
+          setUser(null);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchUser();
+    }
+  }, [id, user]);
+
+  if (loading) {
+    return (
+      <div className="page">
+        <div className="loading-screen"><div className="spinner"></div></div>
+      </div>
+    );
+  }
 
   if (!user) {
     return (

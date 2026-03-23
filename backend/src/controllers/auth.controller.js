@@ -116,4 +116,29 @@ async function getMe(req,res){
         return res.status(500).json({message:error.message})
     }
 }
-module.exports={register,login,logout,updateProfile,getMe}
+async function getUserById(req,res){
+    try{
+        const user = await userModel.findById(req.params.id, { password: 0 })
+        if(!user){
+            return res.status(404).json({message:"User not found"})
+        }
+        return res.status(200).json({
+            message:"User fetched successfully",
+            user:user
+        })
+    }catch(error){
+        return res.status(500).json({message:error.message})
+    }
+}
+async function getUsers(req,res){
+    try{
+        const users = await userModel.find({}, { password: 0 })
+        return res.status(200).json({
+            message:"Users fetched successfully",
+            users:users
+        })
+    }catch(error){
+        return res.status(500).json({message:error.message})
+    }
+}
+module.exports={register,login,logout,updateProfile,getMe,getUsers,getUserById}
