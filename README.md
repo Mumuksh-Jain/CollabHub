@@ -47,16 +47,16 @@ Finding the right collaborators for a side project is hard. Posting in forums ra
 ## 📸 Screenshots
 
 ### Home
-![Home](frontend/public/src/assets/screenshots/Home.png)
+![Home](frontend/src/assets/screenshots/Home.png)
 
 ### Login
-![Login](frontend/public/src/assets/screenshots/login.png)
+![Login](frontend/src/assets/screenshots/login.png)
 
 ### AI Project Enhancer
-![AI Project Enhancer](frontend/public/src/assets/screenshots/AI%20Project%20Enhancer.png)
+![AI Project Enhancer](frontend/src/assets/screenshots/AI%20Project%20Enhancer.png)
 
 ### AI Team Recommendation
-![AI Team Recommendation](frontend/public/src/assets/screenshots/AI%20Team%20Recommendation.png)
+![AI Team Recommendation](frontend/src/assets/screenshots/AI%20Team%20Recommendation.png)
 
 ---
 
